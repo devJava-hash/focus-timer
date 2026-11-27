@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Focus Timer</string>
+    <string name="service_label">Focus Timer app blocker</string>
+    <string name="service_description">Detects which app is open so Focus Timer can block the apps you chose during focus time. It does not read your screen or send any data.</string>
 </resources>

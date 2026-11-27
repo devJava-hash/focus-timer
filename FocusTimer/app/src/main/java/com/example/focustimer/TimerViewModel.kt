@@ -12,6 +12,7 @@ import kotlinx.coroutines.launch
 
 class TimerViewModel(app: Application) : AndroidViewModel(app) {
     private val store = Store(app)
+    private val block = BlockStore(app)
 
     var subjects by mutableStateOf(store.subjects())
         private set
@@ -43,6 +44,7 @@ class TimerViewModel(app: Application) : AndroidViewModel(app) {
         if (running) return
         if (idle) startedAt = System.currentTimeMillis()
         endAt = System.currentTimeMillis() + remainingSec * 1000L
+        block.setTimerEnd(endAt)
         running = true
         job = viewModelScope.launch {
             while (running) {
@@ -55,6 +57,7 @@ class TimerViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     fun pause() {
+        block.setTimerEnd(0)
         running = false
         job?.cancel()
     }
@@ -66,6 +69,7 @@ class TimerViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     private fun finish() {
+        block.setTimerEnd(0)
         running = false
         job?.cancel()
         val done = elapsedSec
