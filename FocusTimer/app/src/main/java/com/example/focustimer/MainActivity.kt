@@ -38,7 +38,7 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun App(vm: TimerViewModel = viewModel()) {
     var tab by remember { mutableStateOf(0) }
-    val titles = listOf("Timer", "Stats", "Subjects")
+    val titles = listOf("Timer", "Stats", "Subjects", "Block")
     Scaffold(
         bottomBar = {
             NavigationBar {
@@ -46,7 +46,7 @@ fun App(vm: TimerViewModel = viewModel()) {
                     NavigationBarItem(
                         selected = tab == i,
                         onClick = { tab = i },
-                        icon = { Text(listOf("⏱", "📊", "📚")[i]) },
+                        icon = { Text(listOf("⏱", "📊", "📚", "🚫")[i]) },
                         label = { Text(t) }
                     )
                 }
@@ -57,7 +57,8 @@ fun App(vm: TimerViewModel = viewModel()) {
             when (tab) {
                 0 -> TimerScreen(vm)
                 1 -> StatsScreen(vm)
-                else -> SubjectsScreen(vm)
+                2 -> SubjectsScreen(vm)
+                else -> BlockScreen()
             }
         }
     }
