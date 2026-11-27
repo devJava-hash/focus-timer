@@ -6,6 +6,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.accessibility.AccessibilityEvent
 import androidx.activity.ComponentActivity
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
@@ -84,10 +85,10 @@ class AppBlockerService : AccessibilityService() {
         val pkg = event.packageName?.toString() ?: return
         if (pkg == packageName) return
         if (pkg !in store.blockedApps() || !store.isBlockingNow()) return
-        performGlobalAction(GLOBAL_ACTION_HOME)
+        // Cover the blocked app right away with the block screen (in its own task).
         startActivity(
             Intent(this, BlockActivity::class.java)
-                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
                 .putExtra("pkg", pkg)
         )
     }
@@ -98,6 +99,10 @@ class AppBlockerService : AccessibilityService() {
 class BlockActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        // Back button also goes home, so you can't slip back into the blocked app.
+        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() = goHome()
+        })
         val pkg = intent.getStringExtra("pkg")
         val label = pkg?.let {
             runCatching { packageManager.getApplicationLabel(packageManager.getApplicationInfo(it, 0)).toString() }
@@ -128,6 +133,6 @@ class BlockActivity : ComponentActivity() {
         startActivity(
             Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_HOME).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         )
-        finish()
+        finishAndRemoveTask()
     }
 }
