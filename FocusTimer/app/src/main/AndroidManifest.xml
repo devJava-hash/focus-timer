@@ -25,6 +25,7 @@
             android:name=".BlockActivity"
             android:exported="false"
             android:excludeFromRecents="true"
+            android:taskAffinity=""
             android:launchMode="singleTask" />
 
         <service
